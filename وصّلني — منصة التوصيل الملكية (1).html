@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>وصّلني — منصة التوصيل الملكية</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;700;900&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#E8C26A;--gold2:#B8862B;--wine:#5C0F1E;--em:#0F5C4D;--saf:#F2A93B;--ivory:#F7F0DF;--sky:#BFE3FA;--navy:#12365C;--hot:#FF4D17;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+body{font-family:Cairo,Tahoma,sans-serif;background:#000;color:#fff}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+:focus-visible{outline:3px solid var(--saf);outline-offset:2px}
+input,select{font:inherit;width:100%;padding:14px;border-radius:12px;border:2px solid #0003;background:#fff;color:#111;font-size:16px}
+label{display:block;font-weight:700;margin:14px 0 5px}
+.v{display:none;min-height:100vh;padding:26px 18px 190px}.v.on{display:block}
+.in{max-width:760px;margin:auto}
+#tabs{position:fixed;inset-inline:0;bottom:0;z-index:20;display:flex;background:rgba(10,8,6,.94);backdrop-filter:blur(12px);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));border-top:1px solid #E8C26A55}
+#tabs button{flex:1;background:none;padding:6px 2px;font-size:12px;font-weight:700;color:#bba;border-radius:12px}
+#tabs button span{display:block;font-size:22px}
+#tabs button.on{color:var(--gold);background:#E8C26A22}
+#bar{position:fixed;inset-inline:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:19;display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--saf);color:#2a1500;border-radius:16px;padding:12px 16px;font-weight:900;box-shadow:0 10px 30px #0008}
+#bar.on{display:flex}
+#bar button{background:#2a1500;color:var(--saf);padding:10px 18px;border-radius:12px;font-weight:900}
+#toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:10px 18px;border-radius:99px;font-weight:700;z-index:30;display:none;box-shadow:0 8px 24px #0006;max-width:92vw;text-align:center}
+.big{border-radius:16px;padding:16px 26px;font-weight:900;font-size:18px;width:100%;margin-top:18px}
+/* 1 HOME ROYAL */
+#home{background:radial-gradient(ellipse at 50% 0,#4a1020,#1a0509 55%,#0a0203);text-align:center}
+#home .fr{border:2px solid var(--gold2);outline:1px solid var(--gold2);outline-offset:7px;padding:34px 18px;margin:8px 8px 0;border-radius:6px}
+#home .cr{width:92px;margin:0 auto 6px;filter:drop-shadow(0 0 18px #E8C26A88)}
+#home h1{font-family:'Aref Ruqaa',serif;font-size:clamp(64px,19vw,120px);line-height:1.15;background:linear-gradient(180deg,#fff2c4,var(--gold) 45%,var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
+#home p{font-family:Amiri,serif;font-size:21px;color:#e8d9b8;margin:6px auto 26px;max-width:420px;line-height:1.8}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.door{background:linear-gradient(180deg,#3a0c18,#1c060b);border:2px solid var(--gold2);border-radius:120px 120px 10px 10px;padding:44px 8px 22px;color:var(--gold);font-family:Amiri,serif;font-size:21px;font-weight:700}
+.door i{display:block;font-style:normal;font-size:36px;margin-bottom:6px}
+/* 2 SHOPS SOUK */
+#shops{background:var(--em) repeating-conic-gradient(from 45deg at 50% 50%,#0000 0 25%,#ffffff0d 0 50%) 0 0/46px 46px}
+#shops h2{font-family:Lalezar;font-weight:400;font-size:52px;color:var(--saf);text-shadow:3px 3px 0 #063a30}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 22px}
+.cats button{background:#0a3f35;border:3px solid var(--saf);border-radius:50% 50% 14px 14px;padding:16px 4px 10px;font-weight:900;font-size:15px}
+.cats button span{display:block;font-size:34px}.cats button.on{background:var(--saf);color:#3a2000}
+.sh{background:var(--ivory);color:#2b1a05;border-radius:0 0 22px 22px;border-top:14px solid var(--saf);margin-bottom:22px;padding:14px;box-shadow:0 10px 0 #063a30}
+.sh h3{font-family:Lalezar;font-weight:400;font-size:28px}.sh small{color:#7a5a20;font-weight:700}
+.ln{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:2px dotted #c9b27a}
+.ln b{flex:1}.q{display:flex;align-items:center;gap:10px}
+.q button{width:38px;height:38px;border-radius:50%;background:var(--em);color:#fff;font-size:22px;font-weight:900}
+.q .m{background:#d8cba8;color:#333}
+/* 3 COURIERS CARDS */
+#cour{background:radial-gradient(circle at 50% 0,#8a1a30,var(--wine) 60%,#2c0610)}
+#cour h2{font-family:'Aref Ruqaa',serif;font-size:50px;color:var(--ivory)}
+.deck{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.cd{background:var(--ivory);color:#3a0c14;border-radius:18px;padding:12px;text-align:center;border:3px solid #fff0;transition:.25s;position:relative;font-family:Amiri,serif}
+.cd.on{transform:translateY(-8px) rotate(-1.5deg);border-color:var(--gold);box-shadow:0 0 0 4px #E8C26A66,0 18px 30px #0008}
+.cd.off{filter:grayscale(1);opacity:.55}
+.cd .rk{position:absolute;top:8px;inset-inline-start:12px;font-size:28px;font-weight:700;color:#a3182f}
+.cd .av{font-size:56px;margin:12px 0 2px}.cd h3{font-size:24px}
+.cd .n{font-family:Cairo;font-weight:900;font-size:34px;color:#a3182f;line-height:1.1}
+.cd .s{color:#d19a1c;letter-spacing:2px;direction:ltr}.cd small{font-family:Cairo;color:#6b4a50}
+.sm{background:var(--ivory);color:#3a0c14;border-radius:18px;padding:18px;margin-top:22px;line-height:2;font-weight:700}
+.sm .t{font-size:26px;font-weight:900;color:#a3182f}
+.pr{display:flex;gap:6px;margin:14px 0}.pr i{flex:1;height:10px;border-radius:9px;background:#d8c8c0}.pr i.on{background:#a3182f}
+.stars button{background:none;font-size:40px;color:#cbb}.stars button.on{color:#e0a416}
+/* 4 SEND AIRMAIL */
+#send{background:linear-gradient(180deg,var(--sky),#e9f6ff);color:var(--navy)}
+#send .ap{border:14px solid transparent;border-image:repeating-linear-gradient(135deg,#d6283a 0 14px,#fff 0 28px,#1f5fae 0 42px,#fff 0 56px) 14;background:#fff;padding:20px;box-shadow:0 18px 40px #12365c33}
+#send h2{font-family:Lalezar;font-weight:400;font-size:40px}
+.dots{display:flex;gap:8px;margin:12px 0 4px}.dots i{flex:1;height:6px;background:#cfe0ee;border-radius:9px}.dots i.on{background:var(--navy)}
+.stp{display:none}.stp.on{display:block}
+.rl{list-style:none;padding:0;margin:10px 0}.rl li{padding:8px 0;border-bottom:1px dashed #9bb7cf;font-weight:700}
+.stamp{border:3px dashed var(--navy);border-radius:10px;padding:14px;text-align:center;transform:rotate(-1.5deg);margin:16px 0;font-weight:900;font-size:20px}
+.cb{display:flex;gap:10px;align-items:center;font-weight:700;margin-top:16px}.cb input{width:26px;height:26px}
+.cde{font:900 54px/1 'Courier New',monospace;letter-spacing:14px;direction:ltr;text-align:center;background:var(--navy);color:var(--sky);padding:16px;border-radius:10px}
+.pv{width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-top:8px}
+/* 5 JOIN POSTER */
+#join{background:var(--hot);color:#111;overflow:hidden}
+#join h2{font-family:Lalezar;font-weight:400;font-size:clamp(110px,36vw,230px);line-height:.8;color:transparent;-webkit-text-stroke:5px #111;margin:6px 0 16px}
+#join .stk{display:inline-block;background:#111;color:var(--hot);font-weight:900;padding:6px 16px;transform:rotate(3deg)}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.rg button{background:#fff;border:5px solid #111;border-radius:0;padding:30px 6px;font-family:Lalezar;font-size:36px;box-shadow:7px 7px 0 #111}
+.rg button.on{background:#111;color:#fff;box-shadow:none;transform:translate(5px,5px)}
+#join input{border:4px solid #111;border-radius:0}
+.ok{background:#111;color:#fff;padding:14px;border-radius:10px;margin-top:14px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){#home h1{animation:r 1.2s ease both}@keyframes r{from{opacity:0;letter-spacing:.3em}}}
+</style></head><body>
+<div id="toast"></div>
+
+<section class="v on" id="home"><div class="in"><div class="fr">
+<svg class="cr" viewBox="0 0 100 70"><path d="M8 58h84l6-40-24 18-24-30-24 30L2 18z" fill="#E8C26A" stroke="#B8862B" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="12" r="5" fill="#B8862B"/></svg>
+<h1>وصّلني</h1><p>كل ما تحتاجه يصلك بيد موصّل تختاره بنفسك</p>
+<div class="doors"><button class="door" data-go="shops"><i>🛍️</i>اطلب</button><button class="door" data-go="send"><i>✉️</i>أرسل طرداً</button><button class="door" data-go="cour"><i>🛵</i>الموصّلون</button><button class="door" data-go="join"><i>👑</i>انضم إلينا</button></div>
+</div></div></section>
+
+<section class="v" id="shops"><div class="in"><h2>السوق</h2><div class="cats" id="cats"></div><div id="sl"></div></div></section>
+
+<section class="v" id="cour"><div class="in"><h2>اختر فارسك</h2><p id="cn" style="color:#f0d9d0;font-family:Amiri,serif;font-size:20px"></p><div class="deck" id="dk"></div><div id="cs"></div></div></section>
+
+<section class="v" id="send"><div class="in"><div class="ap">
+<h2>أرسل طرداً</h2><div class="dots"><i class="on"></i><i></i><i></i></div>
+<div class="stp on" id="s1"><label>من أين نستلم؟</label><input id="pa" placeholder="الحي والشارع"><label>إلى أين نوصّل؟</label><input id="da" placeholder="الحي والشارع"><label>هاتف المستلم</label><input id="rp" inputmode="tel" placeholder="0555 00 00 00"><label>المسافة: <b id="skm">4</b> كم</label><input type="range" id="km" min="1" max="30" value="4"><button class="big" style="background:var(--navy);color:#fff" data-n="2">التالي</button></div>
+<div class="stp" id="s2"><label>ما نوع الطرد؟</label><select id="pt"><option>وثائق</option><option>ملابس</option><option>أكل</option><option>إلكترونيات</option><option>أخرى</option></select><label>قيمته بالدينار</label><input id="val" type="number" value="2000" max="20000">
+<label>صورة الطرد (إجبارية)</label><input type="file" id="ph" accept="image/*" capture="environment"><div id="pv"></div>
+<ul class="rl"><li>🚫 ممنوع: مخدرات، أسلحة، كحول، مسروقات</li><li>📸 الموصّل يصوّر الطرد عند الاستلام والتسليم</li><li>🔑 لا تسليم بدون كود المستلم</li><li>👀 يحق للموصّل فتح الطرد أمامك</li><li>💰 الحد الأقصى 20,000 د.ج</li></ul>
+<label class="cb"><input type="checkbox" id="ag"> أوافق على القواعد وأقرّ أن طردي سليم</label>
+<button class="big" style="background:var(--navy);color:#fff" data-n="3">التالي</button></div>
+<div class="stp" id="s3"><div class="stamp" id="sq"></div><button class="big" style="background:#d6283a;color:#fff" id="go">اطلب موصّلاً</button><div id="so"></div></div>
+</div></div></section>
+
+<section class="v" id="join"><div class="in"><h2>انضم</h2><span class="stk">نبحث عن أبطال</span>
+<div class="rg"><button class="on" data-role="موصّل">موصّل</button><button data-role="مسوّق">مسوّق</button></div>
+<form id="jf"><label>الاسم</label><input required id="jn"><label>الهاتف</label><input required id="jp" inputmode="tel"><label>المدينة</label><input required><div id="jx"></div>
+<button class="big" style="background:#111;color:#fff;border-radius:0">أرسل طلبي</button><div id="jo"></div></form></div></section>
+
+<div id="bar"><span id="bt"></span><button data-go="cour">اختر الموصّل</button></div>
+<div id="tabs"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const shops=[
+{n:'مطعم الأصالة',t:'أكل',e:'🍲',km:2.1,i:[['كسكسي',650],['شخشوخة',550],['بيتزا',600],['سلطة',250]]},
+{n:'برجر سيتي',t:'أكل',e:'🍔',km:3.4,i:[['برجر كلاسيك',500],['تشيز برجر',650],['بطاطا',200]]},
+{n:'سوق الخضر',t:'خضر',e:'🥬',km:1.2,i:[['طماطم 1كغ',90],['بطاطا 1كغ',70],['فلفل 1كغ',140]]},
+{n:'بقالة الحي',t:'بقالة',e:'🛒',km:.8,i:[['حليب',90],['خبز',20],['زيت 1ل',250]]},
+{n:'صيدلية الشفاء',t:'صيدلية',e:'💊',km:2.8,i:[['مسكن بدون وصفة',150],['كمامات',100]]}];
+const cats=[['الكل','✨'],['أكل','🍽️'],['خضر','🥕'],['بقالة','🛒'],['صيدلية','💊']];
+const cr=[{n:'أمين',a:'🛵',v:'سكوتر',r:4.9,c:312,on:1,k:1,rk:'A'},{n:'ياسين',a:'🏍️',v:'دراجة نارية',r:4.7,c:188,on:1,k:.9,rk:'K'},{n:'سارة',a:'🚲',v:'دراجة',r:4.8,c:97,on:1,k:1.3,rk:'Q'},{n:'كريم',a:'🚗',v:'سيارة',r:4.2,c:45,on:0,k:1,rk:'J'}];
+let cart={},shop=null,flt='الكل',cc=null,rate=0,role='موصّل';
+const fmt=n=>n.toLocaleString('ar-DZ')+' د.ج';
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t.h);t.h=setTimeout(()=>t.style.display='none',2600)};
+function price(km,k=1){const night=(h=>h>=22||h<6)(new Date().getHours());const min=Math.round((6+km/.4)*k);let f=100+35*km+3*min;if(night)f*=1.25;return{min,fee:Math.round(f/10)*10,night}}
+[['home','👑','الرئيسية'],['shops','🛍️','السوق'],['cour','🛵','الموصّلون'],['send','✉️','طرد'],['join','🔥','انضم']].forEach(([i,e,l])=>{const b=document.createElement('button');b.dataset.go=i;b.innerHTML=`<span>${e}</span>${l}`;$('#tabs').append(b)});
+function go(id){$$('.v').forEach(v=>v.classList.toggle('on',v.id==id));$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.go==id));scrollTo(0,0);if(id=='cour')dC();$('#bar').classList.toggle('on',id=='shops'&&tot().n>0)}
+const tot=()=>{let t=0,n=0;if(shop!==null)for(const j in cart){t+=shops[shop].i[j][1]*cart[j];n+=cart[j]}return{t,n}};
+function upBar(){const{t,n}=tot();$('#bar').classList.toggle('on',n>0&&$('#shops').classList.contains('on'));$('#bt').textContent=`🧺 ${n} • ${fmt(t)}`}
+function dS(){$('#cats').innerHTML=cats.map(([c,e])=>`<button class="${c==flt?'on':''}" data-f="${c}"><span>${e}</span>${c}</button>`).join('');
+$('#sl').innerHTML=shops.map((s,i)=>flt!='الكل'&&s.t!=flt?'':`<div class="sh"><div style="display:flex;justify-content:space-between;align-items:center"><div><h3>${s.n}</h3><small>${s.km} كم منك</small></div><span style="font-size:44px">${s.e}</span></div>${s.i.map((p,j)=>{const q=shop===i?cart[j]||0:0;return`<div class="ln"><b>${p[0]}</b><span>${fmt(p[1])}</span><div class="q">${q?`<button class="m" data-m="${i}-${j}">−</button><b>${q}</b>`:''}<button data-p="${i}-${j}">+</button></div></div>`}).join('')}</div>`).join('')}
+document.addEventListener('click',e=>{const t=e.target.closest('button,[data-go]');if(!t)return;const d=t.dataset;
+if(d.go)go(d.go);
+if(d.f){flt=d.f;dS()}
+if(d.p){const[i,j]=d.p.split('-').map(Number);if(shop!==i){if(tot().n)toast('السلة تخص محلاً واحداً، بدأنا سلة جديدة');shop=i;cart={}}cart[j]=(cart[j]||0)+1;dS();upBar()}
+if(d.m){const[i,j]=d.m.split('-').map(Number);cart[j]--;if(!cart[j])delete cart[j];dS();upBar()}
+if(d.c){const i=+d.c;if(!cr[i].on)return toast('هذا الموصّل غير متاح الآن');cc=i;dC()}
+if(t.id=='ord')track();
+if(d.s){rate=+d.s;$$('.stars button').forEach((b,k)=>b.classList.toggle('on',k<rate))}
+if(t.id=='sr'){if(!rate)return toast('اختر عدد النجوم');const c=cr[cc];c.r=(c.r*c.c+rate)/(c.c+1);c.c++;$('#rt').innerHTML='<b>شكراً، تم حفظ تقييمك ⭐</b>';cc=null}
+if(d.n)step(+d.n);
+if(d.role){role=d.role;$$('[data-role]').forEach(b=>b.classList.toggle('on',b.dataset.role==role));jx()}});
+dS();
+const st=r=>'★'.repeat(Math.round(r))+'☆'.repeat(5-Math.round(r));
+function dC(){const{n}=tot(),km=shop!==null?shops[shop].km:3;
+$('#cn').textContent=n?'اضغط على بطاقة من تثق به':'السلة فارغة. هذه تقييمات موصّلينا.';
+$('#dk').innerHTML=cr.map((c,i)=>{const p=price(km,c.k);return`<button class="cd ${cc===i?'on':''} ${c.on?'':'off'}" data-c="${i}"><div class="rk">${c.rk}</div><div class="av">${c.a}</div><h3>${c.n}</h3><div class="n">${c.r.toFixed(1)}</div><div class="s">${st(c.r)}</div><small>${c.c} توصيلة • ${c.v}</small><br><b style="font-family:Cairo">${p.min} د • ${fmt(p.fee)}</b></button>`}).join('');
+if(n&&cc!==null){const s=shops[shop],c=cr[cc],p=price(s.km,c.k),{t}=tot();$('#cs').innerHTML=`<div class="sm">المنتجات: ${fmt(t)}<br>التوصيل: ${fmt(p.fee)} (${s.km} كم، حوالي ${p.min} دقيقة${p.night?'، تسعيرة الليل':''})<br><span class="t">المجموع ${fmt(t+p.fee)}</span><button class="big" id="ord" style="background:#a3182f;color:#fff;margin-top:6px">أكّد الطلب مع ${c.n}</button></div>`}else $('#cs').innerHTML=''}
+function track(){const c=cr[cc],S=['تم القبول ✅','المحل يجهّز 👨‍🍳','في الطريق 🛵','وصل 🎉'];cart={};shop=null;upBar();rate=0;let k=0;
+$('#cs').innerHTML=`<div class="sm"><b>طلبك مع ${c.n}</b><div class="pr">${S.map(()=>'<i></i>').join('')}</div><div id="sg"></div><div id="rt"></div></div>`;
+(function f(){$$('.pr i').forEach((x,i)=>x.classList.toggle('on',i<=k));$('#sg').textContent=S[k];if(k<3){k++;setTimeout(f,1500)}else $('#rt').innerHTML=`<p>قيّم ${c.n}</p><div class="stars">${[1,2,3,4,5].map(n=>`<button data-s="${n}">★</button>`).join('')}</div><button class="big" id="sr" style="background:#a3182f;color:#fff;margin-top:6px">أرسل التقييم</button>`})()}
+/* send */
+function step(n){if(n==2&&(!$('#pa').value||!$('#da').value||!/^0[567]\d{8}$/.test($('#rp').value.replace(/\s/g,''))))return toast('أكمل العناوين ورقم هاتف صحيح');
+if(n==3){if(!ph)return toast('صورة الطرد إجبارية');if(+$('#val').value>20000)return toast('القيمة أعلى من الحد المسموح');if(!$('#ag').checked)return toast('وافق على القواعد أولاً')}
+$$('.stp').forEach((s,i)=>s.classList.toggle('on',i==n-1));$$('.dots i').forEach((d,i)=>d.classList.toggle('on',i<n));if(n==3)q()}
+function q(){const p=price(+$('#km').value),ins=+$('#val').value>5000?100:0;$('#sq').innerHTML=`${$('#km').value} كم • ~${p.min} دقيقة<br>${fmt(p.fee+ins)}${ins?'<br><small>يشمل تأميناً</small>':''}`}
+$('#km').oninput=()=>$('#skm').textContent=$('#km').value;
+let ph=0;$('#ph').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{ph=1;$('#pv').innerHTML=`<img class="pv" src="${r.result}" alt="">`};r.readAsDataURL(f)};
+$('#go').onclick=()=>{const c=String(1000+Math.floor(Math.random()*9000));$('#so').innerHTML=`<p style="margin:14px 0 8px;font-weight:700">أعطِ هذا الكود للمستلم. لا يُسلَّم الطرد بدونه:</p><div class="cde">${c}</div>`;$('#go').style.display='none'};
+/* join */
+const F={'موصّل':'<label>وسيلة النقل</label><select><option>دراجة</option><option>سكوتر</option><option>دراجة نارية</option><option>سيارة</option></select><label>صورة بطاقة التعريف</label><input type="file" accept="image/*" required><label>صورة رخصة السياقة</label><input type="file" accept="image/*">','مسوّق':'<label>خبرتك في التسويق</label><input required><label>رابط أعمالك</label><input>'};
+const jx=()=>{$('#jx').innerHTML=F[role];$('#jo').innerHTML=''};jx();
+$('#jf').onsubmit=e=>{e.preventDefault();$('#jo').innerHTML=`<div class="ok">وصلنا طلبك يا ${$('#jn').value}. سنتصل بك للتقديم كـ${role}.</div>`};
+go('home');
+</script></body></html>
