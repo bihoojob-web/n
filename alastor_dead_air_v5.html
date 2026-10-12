@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#10070c">
+<title>ALASTOR: Dead Air — Responsive Edition</title>
+<style>
+:root{--red:#ff3157;--hot:#ff174d;--pink:#ff8a9d;--ink:#10070c;--panel:rgba(18,7,13,.88);--gold:#ffd58a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090509;color:#f8e9ec;font-family:Georgia,"Times New Roman",serif;touch-action:none}
+body{background:radial-gradient(ellipse at 50% 30%,#3a0b1c 0,#120710 48%,#060407 100%)}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+#grain{position:fixed;inset:0;pointer-events:none;opacity:.075;z-index:3;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");mix-blend-mode:screen}
+#vignette{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.58) 100%)}
+.hud{position:fixed;z-index:5;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;pointer-events:none}
+.brand{font-size:clamp(16px,3.2vw,26px);letter-spacing:.14em;color:#ff4867;text-shadow:0 0 14px #ff174d;line-height:1;font-weight:bold}
+.brand small{display:block;color:#d7a7b1;font-size:9px;letter-spacing:.24em;margin-top:5px}
+.panel{background:linear-gradient(135deg,rgba(30,9,19,.93),rgba(9,5,10,.82));border:1px solid rgba(255,65,97,.5);box-shadow:0 0 22px #ff174d1c,inset 0 0 18px #ff174d0b;padding:9px 11px;backdrop-filter:blur(8px)}
+.stats{width:min(42vw,260px)}.statlabel{display:flex;justify-content:space-between;font:10px Arial,sans-serif;letter-spacing:.12em;color:#f2b7c2;margin-bottom:4px}
+.bar{height:7px;background:#31101d;border:1px solid #7d2137;margin-bottom:7px;overflow:hidden}.fill{height:100%;width:100%;transition:width .16s;background:linear-gradient(90deg,#b80d35,#ff4966,#ffc0c8);box-shadow:0 0 10px #ff3157}
+#bossFill{background:linear-gradient(90deg,#6710a0,#f32c69,#ffd58a)}
+#scoreLine{margin-top:5px;font:9px Arial,sans-serif;letter-spacing:.12em;color:#f0b7c2;display:flex;justify-content:space-between}
+#bossbarWrap{position:fixed;z-index:5;left:50%;top:166px;transform:translateX(-50%);width:min(380px,64vw);display:none;pointer-events:none}
+#bossbarWrap.show{display:block}
+#bossbarWrap .statlabel{color:#f7c8ff}
+#bossFill{height:100%;width:100%;background:linear-gradient(90deg,#6411a0,#f12e7a,#ffc0da)}
+#bossPhase{font:8px Arial,sans-serif;color:#e5b3ed;letter-spacing:.18em;text-align:center;margin-top:4px}
+.damageFloat{font:bold 15px Georgia,serif;color:#ffd6df;text-shadow:0 0 8px #ff174d}
+.topbuttons{display:flex;gap:6px;pointer-events:auto}.tinybtn{background:#180a12e8;border:1px solid #a72b49;color:#ffb3c0;padding:8px 10px;font:10px Arial,sans-serif;letter-spacing:.1em;cursor:pointer}
+#objective{position:fixed;z-index:5;top:104px;left:50%;transform:translateX(-50%);text-align:center;width:max-content;max-width:90vw;text-shadow:0 2px 8px #000}
+#objective b{display:block;color:#ffd0d7;font-size:clamp(12px,2.3vw,17px);letter-spacing:.14em}
+#objective span{font:10px Arial,sans-serif;color:#ce9ba6;letter-spacing:.14em;display:block;margin-top:5px}
+#banner{position:fixed;z-index:7;left:50%;top:28%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
+#banner.show{opacity:1}#banner strong{display:block;font-size:clamp(24px,7vw,56px);color:#ff4165;letter-spacing:.08em;text-shadow:0 0 18px #ff174d,3px 3px #25000c}#banner span{font:11px Arial,sans-serif;letter-spacing:.3em;color:#ffe0e5}
+#dialogue{position:fixed;z-index:5;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(600px,88vw);padding:10px 15px;text-align:center;background:linear-gradient(90deg,transparent,#12060ce8 18%,#12060ce8 82%,transparent);border-top:1px solid #9e2b46;border-bottom:1px solid #9e2b46;color:#ffd7dd;font-size:clamp(12px,2.4vw,16px);font-style:italic;min-height:43px;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 5px #000}
+#dialogue:before{content:"◖ ON AIR ◗";position:absolute;top:-9px;left:50%;transform:translateX(-50%);font:8px Arial,sans-serif;letter-spacing:.2em;color:#ff5b78;background:#16070e;padding:2px 7px}
+#controls{position:fixed;z-index:6;inset:auto 0 0;display:flex;justify-content:space-between;align-items:flex-end;padding:12px max(14px,env(safe-area-inset-right)) calc(13px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));pointer-events:none}
+#stick{width:clamp(100px,27vw,145px);height:clamp(100px,27vw,145px);border-radius:50%;position:relative;pointer-events:auto;background:radial-gradient(circle,#38101d99,#13070cbf 65%);border:1px solid #b73551a8;box-shadow:inset 0 0 22px #ff174d22}
+#stick:before{content:"";position:absolute;inset:25%;border:1px solid #8c2940a1;border-radius:50%}#nub{position:absolute;width:38%;height:38%;left:31%;top:31%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8296,#9d1434 72%);border:1px solid #ffb6c3;box-shadow:0 0 18px #ff174d80}
+#actionpad{display:grid;grid-template-columns:repeat(2,clamp(56px,15vw,76px));grid-template-rows:repeat(2,clamp(56px,15vw,76px));gap:8px;pointer-events:auto}
+.action{border-radius:50%;border:1px solid #e94a6b;background:radial-gradient(circle at 35% 25%,#4e1527ed,#14070df5 70%);box-shadow:0 0 16px #ff174d2b,inset 0 0 13px #ff31571a;color:#ffd6de;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;user-select:none;-webkit-user-select:none;touch-action:none}
+.action{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.action:focus-visible,.tinybtn:focus-visible,.primary:focus-visible{outline:2px solid #ffd58a;outline-offset:3px}.action:active,.action.pressed{background:radial-gradient(circle at 35% 25%,#a32145,#290814);box-shadow:0 0 23px #ff174d77}
+.action .glyph{font-size:22px;line-height:1}.action small{font:8px Arial,sans-serif;letter-spacing:.1em;color:#ffa6b7}
+#hint{position:fixed;z-index:5;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));font:9px Arial,sans-serif;letter-spacing:.08em;color:#a87b86;text-align:right;pointer-events:none}
+#start,#pauseMenu{position:fixed;z-index:10;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at center,#3c0b1cdd,#080409f5 70%);text-align:center}
+#start.hidden,#pauseMenu.hidden{display:none}.card{width:min(550px,94vw);padding:clamp(22px,5vw,42px);border:1px solid #c53757;background:linear-gradient(150deg,#200914f5,#0a050af7);box-shadow:0 0 70px #ff174d20;position:relative}
+.card:before,.card:after{content:"";position:absolute;width:28px;height:28px;border-color:#ff647e;border-style:solid}.card:before{left:7px;top:7px;border-width:1px 0 0 1px}.card:after{right:7px;bottom:7px;border-width:0 1px 1px 0}
+.eyebrow{font:10px Arial,sans-serif;color:#ff7189;letter-spacing:.32em}.title{font-size:clamp(32px,9vw,65px);line-height:.95;letter-spacing:.06em;color:#ff3a5d;text-shadow:0 0 22px #ff174d55;margin:15px 0 9px}.subtitle{font:11px Arial,sans-serif;color:#d6a2ad;letter-spacing:.24em}
+.copy{max-width:410px;margin:23px auto;color:#ead4d8;font-size:14px;line-height:1.7}
+.primary{border:1px solid #ff7e94;background:linear-gradient(90deg,#a50e35,#f52e55);color:#fff3f5;padding:14px 28px;font:12px Arial,sans-serif;letter-spacing:.2em;box-shadow:0 0 25px #ff174d35;cursor:pointer}
+.note{font:10px Arial,sans-serif;color:#986c78;line-height:1.7;margin-top:16px}
+#toast{position:fixed;z-index:20;top:20%;left:50%;transform:translateX(-50%);padding:9px 15px;background:#190811;border:1px solid #d23a5a;color:#ffd6de;font:10px Arial,sans-serif;letter-spacing:.12em;opacity:0;transition:opacity .2s;pointer-events:none}
+#comboHud{position:fixed;z-index:5;left:50%;top:155px;transform:translateX(-50%);font-weight:bold;font-size:clamp(16px,4vw,25px);color:#ffd5dc;text-shadow:0 0 12px #ff174d;letter-spacing:.1em;opacity:0;transition:opacity .15s;pointer-events:none}
+#comboHud small{display:block;font:9px Arial,sans-serif;letter-spacing:.24em;color:#ff7790;text-align:center;margin-top:3px}
+#bossAlert{position:fixed;z-index:6;inset:0;pointer-events:none;border:0 solid #ff174d;opacity:0}
+#bossAlert.active{animation:bossPulse .8s ease-out}
+@keyframes bossPulse{0%{opacity:.8;border-width:18px}100%{opacity:0;border-width:0}}
+#missionCard{position:fixed;z-index:5;left:14px;top:118px;width:170px;padding:10px 12px;background:linear-gradient(135deg,#1c0914e8,#090509d9);border-left:2px solid #ff3157;pointer-events:none}
+#missionCard strong{display:block;font:9px Arial,sans-serif;letter-spacing:.2em;color:#ff6680;margin-bottom:6px}
+#missionCard span{font-size:12px;color:#f5dce1;line-height:1.35}
+#missionCard .mini{height:3px;background:#451224;margin-top:8px}.mini i{display:block;height:100%;width:0;background:#ff4568;transition:width .2s}
+#skillToast{position:fixed;z-index:7;bottom:calc(175px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#160710ed;border:1px solid #d63a5c;color:#ffced7;padding:8px 12px;font:10px Arial,sans-serif;letter-spacing:.12em;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#skillToast.on{opacity:1}
+#upgrade{position:fixed;z-index:8;inset:0;display:none;align-items:center;justify-content:center;background:#070309df;padding:18px}
+#upgrade.show{display:flex}
+.upgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+.upcard{padding:12px 7px;min-height:115px;border:1px solid #9e2a48;background:linear-gradient(150deg,#2a0b18,#10070d);color:#fbe8ec;text-align:center}
+.upcard b{display:block;color:#ff6580;font-size:12px;margin-bottom:8px}.upcard span{font:10px Arial,sans-serif;color:#d9aab4;line-height:1.4;display:block}
+.upcard button{margin-top:10px;border:1px solid #d34a68;background:#4c1025;color:#ffeaf0;padding:7px 8px;font:9px Arial,sans-serif;letter-spacing:.08em}
+@media(max-width:480px){
+ .hud{display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,46vw);align-items:start;gap:6px}
+ .hud>div:first-child{grid-column:1;grid-row:1;min-width:0}
+ .brand{font-size:clamp(13px,4vw,18px);letter-spacing:.1em}
+ .brand small{font-size:7px;letter-spacing:.12em}
+ .stats{grid-column:2;grid-row:1 / span 2;width:100%;max-width:190px;padding:7px 8px}
+ .topbuttons{grid-column:1;grid-row:2;justify-content:flex-start;margin-top:4px;gap:4px}
+ .tinybtn{padding:7px 8px;font-size:9px}
+ #missionCard{display:none}
+ #objective{top:106px}
+ #bossbarWrap{top:165px;width:68vw}
+ #comboHud{top:205px}
+ #dialogue{top:244px;bottom:auto;width:90vw;padding:8px 10px;min-height:36px;font-size:12px}
+ .upgrid{gap:5px}.upcard{padding:10px 5px;min-height:122px}
+}
+
+@media(min-width:800px){#controls{padding-left:5vw;padding-right:5vw}#dialogue{bottom:24px}#hint{bottom:16px}#stick{width:110px;height:110px}#actionpad{grid-template-columns:repeat(4,68px);grid-template-rows:68px}#objective{top:90px}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas><div id="grain"></div><div id="vignette"></div>
+<div class="hud">
+ <div><div class="brand">ALASTOR <small>THE RADIO DEMON · DEAD AIR</small></div></div>
+ <div class="panel stats">
+  <div class="statlabel"><span>SOUL INTEGRITY</span><span id="hpText">100 / 100</span></div><div class="bar"><div id="hpFill" class="fill"></div></div>
+  <div class="statlabel"><span>RADIO CHARGE</span><span id="chargeText">100%</span></div><div class="bar"><div id="chargeFill" class="fill" style="background:linear-gradient(90deg,#7a1ab5,#ff4b86,#ffd58a)"></div></div><div id="scoreLine"><span>SCORE <b id="scoreText">000000</b></span><span>RECORD <b id="recordText">000000</b></span></div>
+ </div>
+ <div class="topbuttons"><button class="tinybtn" id="soundBtn">♫ SOUND ON</button><button class="tinybtn" id="pauseBtn">Ⅱ</button></div>
+</div>
+<div id="objective"><b id="objectiveTitle">THE AIRWAVES ARE HUNGRY</b><span id="objectiveSub">CLEAR THE LOST SOULS · 0 / 8</span></div><div id="bossbarWrap"><div class="statlabel"><span>THE STATION MASTER</span><span id="bossHpText">300 / 300</span></div><div class="bar"><div id="bossFill"></div></div><div id="bossPhase">PHASE I · THE WARM-UP</div></div>
+<div id="banner"><strong id="bannerTitle">DEAD AIR</strong><span id="bannerSub">THE SHOW MUST GO ON</span></div>
+<div id="dialogue">“Well, well… looks like we have an audience.”</div>
+<div id="controls">
+ <div id="stick"><div id="nub"></div></div>
+ <div id="actionpad">
+  <button class="action" data-act="attack"><span class="glyph">♜</span><small>ATTACK</small></button>
+  <button class="action" data-act="dash"><span class="glyph">»</span><small id="dashLabel">BLINK</small></button>
+  <button class="action" data-act="blast"><span class="glyph">◉</span><small id="blastLabel">BLAST · 28%</small></button>
+  <button class="action" data-act="special"><span class="glyph">☠</span><small id="specialLabel">ON AIR · 70%</small></button>
+ </div>
+</div>
+<div id="hint">LEFT: MOVE · RIGHT: ATTACK / BLINK / BLAST / ULTIMATE<br>DESKTOP: WASD / ARROWS · J K L I</div>
+<div id="toast"></div><div id="comboHud">12 HIT COMBO<small>THE CROWD LOVES YOU</small></div><div id="bossAlert"></div>
+<div id="missionCard"><strong>FIELD TRANSMISSION</strong><span id="missionText">Clear the studio perimeter</span><div class="mini"><i id="missionFill"></i></div></div>
+<div id="skillToast"></div>
+<div id="upgrade"><div class="card"><div class="eyebrow">INTERMISSION · SELECT A BLESSING</div><div class="title" style="font-size:clamp(28px,7vw,46px)">TUNE YOURSELF</div><div class="copy">The audience demands an encore. Choose one upgrade before the next wave.</div><div class="upgrid">
+<div class="upcard"><b>SOUL ARMOR</b><span>Restore 30 integrity and increase maximum health.</span><button data-up="armor">SELECT</button></div>
+<div class="upcard"><b>HOTTER SIGNAL</b><span>Radio blast deals more damage and costs less charge.</span><button data-up="signal">SELECT</button></div>
+<div class="upcard"><b>QUICKENED STEP</b><span>Move faster and blink more frequently.</span><button data-up="step">SELECT</button></div>
+</div><button class="tinybtn" id="skipUpgrade">NO THANKS · KEEP MOVING</button></div></div>
+<div id="start"><div class="card">
+ <div class="eyebrow">FAN-MADE BROWSER ACTION GAME · V5</div><div class="title">DEAD<br>AIR</div><div class="subtitle">ALASTOR · THE RADIO DEMON · V5</div>
+ <div class="copy">The signal is live. The lost souls are gathering outside the studio. Master the cane, blink through the shadows, collect signal shards, and survive the Station Master's cursed broadcast. Every hit feeds the show.</div>
+ <button class="primary" id="playBtn">▶ &nbsp; GO ON AIR</button>
+ <div class="note">Original synthesized radio-jazz ambience and browser-generated effects.<br>Fan-made concept; not affiliated with or endorsed by the official series.</div>
+ </div></div>
+<div id="pauseMenu" class="hidden"><div class="card"><div class="eyebrow">BROADCAST INTERRUPTED</div><div class="title" style="font-size:42px">HOLD THAT THOUGHT</div><div class="copy">Your audience is waiting, dear.</div><button class="primary" id="resumeBtn">RESUME THE SHOW</button><div style="height:10px"></div><button class="tinybtn" id="restartBtn">RESTART BROADCAST</button></div></div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=innerWidth,H=innerHeight,DPR=Math.min(devicePixelRatio||1,2),running=false,paused=false,gameOver=false,won=false,last=0,elapsed=0,shake=0,flash=0,muted=false;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
+const player={x:0,y:0,r:17,hp:100,maxHp:100,charge:100,faceX:1,faceY:0,inv:0,attack:0,dash:0,special:0,combo:0,comboTime:0,anim:0};
+let enemies=[],particles=[],waves=[],decals=[],projectiles=[],pickups=[],floats=[],kills=0,spawned=0,level=1,bestCombo=0,comboShown=0,score=0,record=0,upgrades={armor:0,signal:0,step:0},intermissionAt=4,upgradedThisRun=false,blastPower=48,blastCost=28,moveSpeed=205,dashCooldown=0,bossPhase=0;
+try{record=Number(localStorage.getItem('deadAirRecord')||0)}catch(e){}
+const keys={},joy={x:0,y:0,on:false};let audio=null,master=null,musicTimer=null,musicStart=null,beat=0;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function rand(a,b){return a+Math.random()*(b-a)}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function say(s){$('dialogue').textContent='“'+s+'”'}
+function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;setTimeout(()=>$('toast').style.opacity=0,1300)}
+function banner(a,b){$('bannerTitle').textContent=a;$('bannerSub').textContent=b;$('banner').classList.add('show');setTimeout(()=>$('banner').classList.remove('show'),1700)}
+function audioInit(){
+ if(audio)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC){toast('AUDIO NOT SUPPORTED IN THIS BROWSER');return}
+ audio=new AC();master=audio.createGain();master.gain.value=muted?0:.5;master.connect(audio.destination);
+ // Warm, original procedural radio-jazz motif: plucked chords, muted bass, static.
+ const comp=[0,3,7,10],roots=[110,130.81,98,116.54];
+ function note(freq,t,dur,type='triangle',vol=.08,detune=0){
+  const o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(freq,t);o.detune.value=detune;f.type='lowpass';f.frequency.value=type==='sawtooth'?1300:2600;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(f);f.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.03)
+ }
+ function chord(){
+  if(!audio||muted||paused||!running)return;let t=audio.currentTime+.02,bar=Math.floor(beat/4)%4,root=roots[bar];
+  note(root,t,.35,'triangle',.055);note(root*1.5,t,.26,'triangle',.035);note(root*1.89,t,.25,'sine',.025);
+  if(beat%2===0){note(root*2*Math.pow(2,Math.floor(rand(0,5))/12),t+.04,.12,'triangle',.026);note(root*.5,t,.3,'sine',.04)}
+  // Tiny filtered static tick
+  if(Math.random()<.23){let o=audio.createOscillator(),g=audio.createGain();o.type='square';o.frequency.value=rand(1800,5000);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.009,t+.005);g.gain.linearRampToValueAtTime(.0001,t+.025);o.connect(g);g.connect(master);o.start(t);o.stop(t+.03)}
+  beat++;musicTimer=setTimeout(chord,beat%4===0?560:280)
+ }
+ musicStart=()=>{if(!audio||muted||!running||paused)return;clearTimeout(musicTimer);chord()};
+ if(running&&!paused)chord();
+}
+function tone(freq=220,dur=.12,wave='sawtooth',vol=.12,slide=0){
+ if(!audio||muted)return;const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter();o.type=wave;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(25,freq+slide),t+dur);f.type='lowpass';f.frequency.value=2200;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(f);f.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.02)
+}
+function noiseBurst(){
+ if(!audio||muted)return;let n=Math.floor(audio.sampleRate*.14),buf=audio.createBuffer(1,n,audio.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*(1-i/n);
+ let src=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain();src.buffer=buf;f.type='bandpass';f.frequency.value=1200;g.gain.value=.12;src.connect(f);f.connect(g);g.connect(master);src.start()
+}
+function speak(line){
+ say(line);
+ if(!('speechSynthesis'in window)||muted)return;
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(line);u.rate=.86;u.pitch=.68;u.volume=.72;let voices=speechSynthesis.getVoices();let v=voices.find(v=>/en-US/i.test(v.lang)&&/male|daniel|david|guy|alex/i.test(v.name))||voices.find(v=>/en-US/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}
+}
+function reset(){
+ player.x=0;player.y=0;player.hp=100;player.maxHp=100;player.charge=100;player.inv=0;player.attack=0;player.dash=0;player.special=0;player.combo=0;player.comboTime=0;player.faceX=1;player.faceY=0;dashCooldown=0;
+ enemies=[];particles=[];waves=[];decals=[];projectiles=[];pickups=[];floats=[];kills=0;spawned=0;elapsed=0;shake=0;flash=0;gameOver=false;won=false;level=1;bestCombo=0;comboShown=0;score=0;bossPhase=0;upgrades={armor:0,signal:0,step:0};intermissionAt=4;upgradedThisRun=false;blastPower=48;blastCost=28;moveSpeed=205;dashCooldown=0;$('upgrade').classList.remove('show');
+ for(let i=0;i<5;i++)spawnEnemy();
+ updateHUD();$('objectiveTitle').textContent='THE AIRWAVES ARE HUNGRY';$('objectiveSub').textContent='CLEAR THE LOST SOULS · 0 / 8';
+}
+function spawnEnemy(boss=false){
+ let a=rand(0,Math.PI*2),r=Math.max(W,H)*rand(.48,.72);
+ let kind='ghoul',hp=35,speed=62,rad=14,damage=7;
+ if(boss){kind='boss';hp=300;speed=44;rad=30;damage=12}
+ else{
+  const roll=Math.random();
+  if(roll<.22){kind='wraith';hp=28;speed=55;rad=13;damage=6}
+  else if(roll<.43){kind='brute';hp=72;speed=34;rad=19;damage=11}
+ }
+ enemies.push({x:Math.cos(a)*r,y:Math.sin(a)*r*.72,hp,maxHp:hp,r:rad,speed,boss,kind,damage,hit:0,attack:rand(.5,1.5),phase:rand(0,6),dead:false,phaseNum:1});
+ spawned++;
+}
+function addScore(n){score+=n;if(score>record){record=score;try{localStorage.setItem('deadAirRecord',String(record))}catch(e){}}}
+function floatText(x,y,text,color='#ffe1e7',size=14){floats.push({x,y,text,color,size,life:.7,max:.7,vy:-28})}
+function puff(x,y,color,n=10,force=120){for(let i=0;i<n;i++){let a=rand(0,Math.PI*2),s=rand(force*.25,force);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(.25,.7),max:.7,r:rand(1,4),color})}}
+function attack(){
+ if(!running||paused||gameOver)return;
+ if(player.attack>0){return;}
+ player.attack=.28;player.anim=.35;player.combo=(player.combo%3)+1;player.comboTime=1.15;bestCombo=Math.max(bestCombo,player.combo);player.charge=clamp(player.charge+3,0,100);tone(260+player.combo*80,.11,'sawtooth',.09,200);noiseBurst();
+ let hit=0;
+ for(const e of enemies){if(e.dead)continue;let dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy);let dot=(dx*player.faceX+dy*player.faceY)/(d||1);if(d<90+(e.boss?15:0)&&dot>-.25){const damage=player.combo===3?28:18;e.hp-=damage;addScore(damage*2);floatText(e.x,e.y-18,'-'+damage,'#ffc0cc',12);e.hit=.16;let k=d?1/d:0;e.x+=dx*k*30;e.y+=dy*k*30;puff(e.x,e.y,'#ff4165',8,100);hit++;if(e.hp<=0)killEnemy(e)}}
+ if(!hit){let target=null,nearest=105;for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<nearest){nearest=d;target=e}}if(target){const dx=target.x-player.x,dy=target.y-player.y,d=Math.hypot(dx,dy)||1;player.faceX=dx/d;player.faceY=dy/d;const damage=player.combo===3?28:18;target.hp-=damage;target.hit=.16;addScore(damage*2+25);floatText(target.x,target.y-18,'-'+damage,'#ffc0cc',12);target.x+=dx/d*24;target.y+=dy/d*24;puff(target.x,target.y,'#ff4165',8,100);hit++;if(target.hp<=0)killEnemy(target)}}
+ if(hit){addScore(hit*25);shake=7;flash=.08;if(player.combo===3){waves.push({x:player.x,y:player.y,r:10,max:105,life:.3,color:'#ff345f'});banner('AIRWAVE COMBO','THE STATIC BITES BACK')}}
+}
+function blast(){
+ if(!running||paused||gameOver)return;
+ if(player.charge<blastCost){toast('RADIO BLAST NEEDS '+blastCost+'% CHARGE');tone(115,.07,'triangle',.035,-20);return;}
+ player.charge-=blastCost;player.attack=.32;waves.push({x:player.x,y:player.y,r:18,max:240,life:.6,color:'#ff2f62'});tone(95,.42,'sawtooth',.2,850);noiseBurst();shake=10;
+ for(const e of enemies){if(e.dead)continue;let d=Math.hypot(e.x-player.x,e.y-player.y);if(d<245){const damage=Math.round(blastPower*(1-d/390));e.hp-=damage;addScore(damage);floatText(e.x,e.y-20,'-'+damage,'#ffa9c1',14);let k=d||1;e.x+=(e.x-player.x)/k*80;e.y+=(e.y-player.y)/k*80;puff(e.x,e.y,'#ff8ba0',12,180);if(e.hp<=0)killEnemy(e)}}
+ speak('Let us turn up the volume, shall we?');
+}
+function dash(){
+ if(!running||paused||gameOver)return;
+ if(player.dash>0||dashCooldown>0){toast('BLINK RECHARGING · '+dashCooldown.toFixed(1)+'s');return;}
+ player.dash=.28;dashCooldown=upgrades.step?1.0:1.65;player.inv=.38;player.charge=clamp(player.charge-5,0,100);let dx=joy.x||((keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0)),dy=joy.y||((keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0));if(Math.hypot(dx,dy)<.1){dx=player.faceX;dy=player.faceY}let m=Math.hypot(dx,dy);player.x+=dx/m*125;player.y+=dy/m*125;puff(player.x,player.y,'#ed2457',18,180);tone(480,.16,'sine',.12,-360);shake=4;
+}
+function special(){
+ if(!running||paused||gameOver)return;
+ if(player.special>0){toast('ULTIMATE RECHARGING');return;}
+ if(player.charge<70){toast('ON AIR NEEDS 70% CHARGE');tone(115,.07,'triangle',.035,-20);return;}
+ player.charge-=70;player.special=1.2;shake=18;flash=.18;waves.push({x:player.x,y:player.y,r:25,max:Math.max(W,H)*.72,life:1,color:'#ff174d'});tone(60,.8,'sawtooth',.25,1400);noiseBurst();speak('Ladies and gentlemen… welcome to my show!');
+ for(const e of enemies){if(e.dead)continue;let d=Math.hypot(e.x-player.x,e.y-player.y);if(d<Math.max(W,H)*.68){const damage=e.boss?65:999;e.hp-=damage;addScore(e.boss?damage*2:100);floatText(e.x,e.y-24,e.boss?'-'+damage:'PURGED', '#ff7c9a', e.boss?15:11);puff(e.x,e.y,'#ff1f56',20,240);if(e.hp<=0)killEnemy(e);else{e.hit=.5;e.x+=(e.x-player.x)/(d||1)*80;e.y+=(e.y-player.y)/(d||1)*80}}}
+}
+function killEnemy(e){
+ if(e.dead)return;e.dead=true;kills++;addScore(e.boss?2500:(e.kind==='brute'?220:e.kind==='wraith'?180:120));
+ player.charge=clamp(player.charge+9,0,100);player.hp=clamp(player.hp+2,0,player.maxHp);
+ puff(e.x,e.y,e.boss?'#f7a1ff':'#ff3157',24,230);decals.push({x:e.x,y:e.y,r:e.r*1.5,life:5});tone(e.boss?70:130,.18,'triangle',.1,-70);
+ floatText(e.x,e.y-25,e.boss?'+2500':'+'+(e.kind==='brute'?220:e.kind==='wraith'?180:120),'#ffd58a',16);
+ if(!e.boss && Math.random()<.32)pickups.push({x:e.x,y:e.y,type:Math.random()<.55?'charge':'health',life:10,r:9,phase:rand(0,6)});
+ if(e.boss){banner('BROADCAST CONQUERED','SCORE '+score.toLocaleString());won=true;gameOver=true;setTimeout(()=>endScreen(true),900)}
+}
+function endScreen(success){paused=true;$('pauseMenu').classList.remove('hidden');$('pauseMenu').querySelector('.eyebrow').textContent=success?'BROADCAST COMPLETE':'SIGNAL LOST';$('pauseMenu').querySelector('.title').textContent=success?'ENCORE?':'OFF THE AIR';$('pauseMenu').querySelector('.copy').textContent=success?'The whole underworld heard that one. Final score: '+score.toLocaleString()+'. Your record is '+record.toLocaleString()+'.':'Final score: '+score.toLocaleString()+'. Your record is '+record.toLocaleString()+'. Tune back in.';$('resumeBtn').textContent=success?'PLAY AGAIN':'TRY AGAIN'}
+function updateHUD(){
+ $('hpText').textContent=Math.ceil(player.hp)+' / '+player.maxHp;
+ $('hpFill').style.width=(player.hp/player.maxHp*100)+'%';
+ $('chargeText').textContent=Math.floor(player.charge)+'%';$('chargeFill').style.width=player.charge+'%';
+ $('scoreText').textContent=String(score).padStart(6,'0');$('recordText').textContent=String(record).padStart(6,'0');
+ const boss=enemies.find(e=>e.boss&&!e.dead);
+ $('bossbarWrap').classList.toggle('show',!!boss);
+ if(boss){
+  $('objectiveTitle').textContent='THE STATION MASTER';$('objectiveSub').textContent='BREAK THE FINAL SIGNAL';
+  $('bossHpText').textContent=Math.ceil(boss.hp)+' / '+boss.maxHp;
+  $('bossFill').style.width=(boss.hp/boss.maxHp*100)+'%';
+  $('bossPhase').textContent=boss.phaseNum===1?'PHASE I · THE WARM-UP':boss.phaseNum===2?'PHASE II · FEEDBACK LOOP':'PHASE III · TOTAL DISTORTION';
+ }else{
+  $('objectiveTitle').textContent='THE AIRWAVES ARE HUNGRY';
+  $('objectiveSub').textContent='CLEAR THE LOST SOULS · '+Math.min(kills,8)+' / 8';
+ }
+ const dashLabel=$('dashLabel');if(dashLabel)dashLabel.textContent=dashCooldown>0?dashCooldown.toFixed(1)+'s':'BLINK';const blastLabel=$('blastLabel');if(blastLabel)blastLabel.textContent=player.charge>=blastCost?'BLAST · READY':'NEED '+blastCost+'%';const specialLabel=$('specialLabel');if(specialLabel)specialLabel.textContent=player.special>0?'RECHARGING':player.charge>=70?'ON AIR · READY':'NEED 70%';
+}
+function update(dt){
+ if(!running||paused||gameOver)return;elapsed+=dt;player.anim=Math.max(0,player.anim-dt);player.attack=Math.max(0,player.attack-dt);player.dash=Math.max(0,player.dash-dt);player.inv=Math.max(0,player.inv-dt);player.special=Math.max(0,player.special-dt);player.comboTime=Math.max(0,player.comboTime-dt);if(!player.comboTime)player.combo=0;player.charge=clamp(player.charge+4*dt,0,100);
+ let dx=joy.x||((keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0)),dy=joy.y||((keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0));let mag=Math.hypot(dx,dy);if(mag>1){dx/=mag;dy/=mag}if(mag>.1){player.faceX=dx;player.faceY=dy;player.x+=dx*moveSpeed*dt;player.y+=dy*moveSpeed*dt}
+ if(kills>=intermissionAt && kills<8 && !upgradedThisRun && !enemies.some(e=>e.boss)){upgradedThisRun=true;paused=true;$('upgrade').classList.add('show');banner('INTERMISSION','CHOOSE YOUR NEXT ADVANTAGE');}
+ if(kills>=8&&!enemies.some(e=>e.boss)&&!won){spawnEnemy(true);banner('SPECIAL GUEST','THE STATION MASTER IS LIVE');$('bossAlert').classList.remove('active');void $('bossAlert').offsetWidth;$('bossAlert').classList.add('active');speak('Oh, how delightful. The headliner has arrived.');}
+ for(const e of enemies){
+  if(e.dead)continue;e.hit=Math.max(0,e.hit-dt);e.attack-=dt;
+  let x=player.x-e.x,y=player.y-e.y,d=Math.hypot(x,y)||1;
+  if(e.boss){
+   let phase=e.hp/e.maxHp<.32?3:e.hp/e.maxHp<.68?2:1;
+   if(phase>e.phaseNum){e.phaseNum=phase;e.speed+=phase===2?14:18;banner(phase===2?'FEEDBACK LOOP':'TOTAL DISTORTION',phase===2?'THE SIGNAL IS MUTATING':'THE AIRWAVES ARE BREAKING');say(phase===2?'You thought that was the whole show?':'Let us make this finale unforgettable.');shake=12;flash=.15;
+    for(let j=0;j<(phase===2?8:14);j++){let a=j*Math.PI*2/(phase===2?8:14);projectiles.push({x:e.x,y:e.y,vx:Math.cos(a)*(phase===2?115:150),vy:Math.sin(a)*(phase===2?115:150),r:phase===2?6:7,life:3.5,damage:phase===2?7:9,color:'#f04cff'})}
+   }
+  }
+  if(e.kind==='wraith'){
+   if(d<185){e.x-=x/d*e.speed*dt;e.y-=y/d*e.speed*dt}
+   else if(d>250){e.x+=x/d*e.speed*dt;e.y+=y/d*e.speed*dt}
+   if(e.attack<=0&&d<380){e.attack=2.0;projectiles.push({x:e.x,y:e.y,vx:x/d*125,vy:y/d*125,r:5,life:3.2,damage:e.damage,color:'#4de4ff'})}
+  }else if(d>player.r+e.r+10){e.x+=x/d*e.speed*dt;e.y+=y/d*e.speed*dt}
+  if(e.boss && e.attack<=0 && d>90){
+   e.attack=e.phaseNum===3?1.05:e.phaseNum===2?1.3:1.65;
+   let count=e.phaseNum===3?3:1,base=Math.atan2(y,x);
+   for(let j=0;j<count;j++){let spread=count===1?0:(j-1)*.22,a=base+spread;projectiles.push({x:e.x,y:e.y,vx:Math.cos(a)*(e.phaseNum===3?175:145),vy:Math.sin(a)*(e.phaseNum===3?175:145),r:7,life:3,damage:e.phaseNum===3?10:9,color:'#f04cff'})}
+   tone(170,.12,'square',.045,120)
+  }
+  if(d<player.r+e.r+5&&e.attack<=0&&e.kind!=='wraith'){
+   e.attack=e.boss?1.0:1.35;
+   if(player.inv<=0){let damage=e.damage;player.hp-=damage;player.inv=.5;shake=8;flash=.12;puff(player.x,player.y,'#ff8da3',8,120);floatText(player.x,player.y-28,'-'+damage,'#ff718b',15);tone(120,.12,'square',.12,-60);if(player.hp<=0){player.hp=0;gameOver=true;endScreen(false)}}
+  }
+ }
+ for(const b of projectiles){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;let d=Math.hypot(b.x-player.x,b.y-player.y);if(d<player.r+b.r && player.inv<=0){player.hp-=b.damage;player.inv=.42;b.life=0;shake=6;flash=.1;puff(player.x,player.y,'#e65cff',8,100);tone(100,.13,'square',.09,-40);if(player.hp<=0){player.hp=0;gameOver=true;endScreen(false)}}}
+ projectiles=projectiles.filter(b=>b.life>0);
+ for(const p of pickups){p.life-=dt;p.phase+=dt*4;if(Math.hypot(p.x-player.x,p.y-player.y)<player.r+p.r+7){if(p.type==='health'){player.hp=clamp(player.hp+22,0,player.maxHp);toast('SOUL FRAGMENT · +22 INTEGRITY')}else{player.charge=clamp(player.charge+30,0,100);toast('SIGNAL SHARD · +30 CHARGE')}p.life=0;tone(620,.12,'sine',.08,180);puff(p.x,p.y,p.type==='health'?'#ff7894':'#f7c9ff',10,90)}}
+ pickups=pickups.filter(p=>p.life>0);
+ if(player.comboTime>0){comboShown=Math.max(comboShown,player.combo);$('comboHud').style.opacity=player.combo>1?'1':'0';$('comboHud').innerHTML=player.combo+' HIT COMBO<small>'+ (player.combo===3?'THE STATIC BITES BACK':'KEEP THE SHOW GOING')+'</small>'}else $('comboHud').style.opacity='0';
+
+ if(spawned<8&&elapsed>spawned*1.8+2&&enemies.filter(e=>!e.dead&&!e.boss).length<6)spawnEnemy();
+ particles=particles.filter(p=>p.life>0);for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.04,dt);p.vy*=Math.pow(.04,dt)}
+ floats=floats.filter(f=>f.life>0);for(const f of floats){f.life-=dt;f.y+=f.vy*dt;f.vy-=5*dt}
+ waves=waves.filter(w=>w.life>0);for(const w of waves){w.life-=dt;w.r+=(w.max-w.r)*Math.min(1,dt*9)}
+ decals=decals.filter(d=>d.life>0);for(const d of decals)d.life-=dt;
+ shake=Math.max(0,shake-dt*24);flash=Math.max(0,flash-dt);dashCooldown=Math.max(0,dashCooldown-dt);updateHUD();
+ $('missionText').textContent=kills<8?'Disrupt the signal · '+Math.min(kills,8)+' / 8':(won?'Broadcast conquered':'Defeat the Station Master');
+ $('missionFill').style.width=(kills<8?Math.min(kills/8,1)*100:(won?100:Math.min(99,80+((180-(enemies.find(e=>e.boss&&!e.dead)?.hp||180))/180)*20)))+'%';
+}
+function pathPoly(points,fill,stroke,lw=1){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function draw(){
+ ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+ let camX=player.x,camY=player.y;ctx.save();if(shake)ctx.translate(rand(-shake,shake),rand(-shake,shake));
+ const scale=Math.min(W/900,H/650);ctx.translate(W/2-camX,H/2-camY);
+ // endless art-deco floor
+ let left=camX-W/2-100,right=camX+W/2+100,top=camY-H/2-100,bottom=camY+H/2+100;
+ ctx.fillStyle='#160811';ctx.fillRect(left,top,right-left,bottom-top);
+ // perspective floor tiles
+ ctx.strokeStyle='#4d1529';ctx.lineWidth=1;
+ let step=70;for(let x=Math.floor(left/step)*step;x<right;x+=step){ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke()}
+ for(let y=Math.floor(top/step)*step;y<bottom;y+=step){ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke()}
+ // central broadcast dais and concentric neon rings
+ ctx.save();ctx.fillStyle='#09040a';ctx.beginPath();ctx.ellipse(0,0,92,66,0,0,Math.PI*2);ctx.fill();
+ const dais=ctx.createRadialGradient(0,0,8,0,0,95);dais.addColorStop(0,'#581329');dais.addColorStop(.7,'#260a18');dais.addColorStop(1,'#10060d');ctx.fillStyle=dais;ctx.beginPath();ctx.ellipse(0,0,88,62,0,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#ff3157';ctx.globalAlpha=.55;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,88,62,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.2;ctx.beginPath();ctx.ellipse(0,0,72,49,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+ // ornate circular sigil
+ ctx.save();ctx.translate(0,0);for(let r=120;r<=500;r+=95){ctx.beginPath();ctx.ellipse(0,0,r,r*.72,0,0,Math.PI*2);ctx.strokeStyle='#7c1a36';ctx.globalAlpha=.18;ctx.lineWidth=2;ctx.stroke()}ctx.globalAlpha=1;
+ for(let i=0;i<24;i++){let a=i*Math.PI/12;ctx.save();ctx.rotate(a);ctx.strokeStyle='#b32649';ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(220,0);ctx.lineTo(246,0);ctx.lineTo(255,-8);ctx.lineTo(267,0);ctx.lineTo(255,8);ctx.stroke();ctx.restore()}ctx.restore();
+ // skyline/columns at far perimeter
+ for(let i=0;i<22;i++){let a=i*Math.PI*2/22,x=Math.cos(a)*Math.max(W,H)*.58,y=Math.sin(a)*Math.max(W,H)*.42;ctx.save();ctx.translate(x,y);ctx.rotate(a+Math.PI/2);ctx.fillStyle='#210b17';ctx.fillRect(-23,-42,46,84);ctx.strokeStyle='#86213d';ctx.lineWidth=2;ctx.strokeRect(-19,-38,38,76);ctx.fillStyle='#ff294f';ctx.globalAlpha=.65;ctx.fillRect(-3,-30,6,3);ctx.globalAlpha=1;ctx.restore()}
+ // decorative antenna lines
+ ctx.strokeStyle='#e22d53';ctx.globalAlpha=.16;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,530,-.8,.8);ctx.stroke();ctx.globalAlpha=1;
+ // shadows
+ for(const d of decals){ctx.globalAlpha=clamp(d.life/5,0,.35);ctx.fillStyle='#020104';ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*1.6,d.r*.75,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+ for(const w of waves){ctx.globalAlpha=clamp(w.life,0,1)*.75;ctx.strokeStyle=w.color;ctx.lineWidth=5*w.life+1;ctx.beginPath();ctx.ellipse(w.x,w.y,w.r,w.r*.72,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.13*w.life;ctx.fillStyle=w.color;ctx.fill();ctx.globalAlpha=1}
+ // enemies
+ for(const e of enemies){if(e.dead)continue;ctx.save();ctx.translate(e.x,e.y);let pulse=1+Math.sin(elapsed*5+e.phase)*.04;ctx.scale(pulse,pulse);
+  ctx.fillStyle='#050307';ctx.beginPath();ctx.ellipse(0,e.r*.7,e.r*1.25,e.r*.62,0,0,Math.PI*2);ctx.fill();
+  if(e.boss){ctx.shadowColor='#d31cff';ctx.shadowBlur=22;ctx.strokeStyle='#d83cff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+7,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0}
+  const bodyColor=e.hit?'#fff0f4':e.boss?'#451044':e.kind==='wraith'?'#10313c':e.kind==='brute'?'#451021':'#300d1c';
+  ctx.fillStyle=bodyColor;ctx.beginPath();
+  if(e.kind==='wraith'){ctx.moveTo(0,-e.r);ctx.quadraticCurveTo(e.r*1.35,-e.r*.2,e.r*.6,e.r);ctx.lineTo(0,e.r*.55);ctx.lineTo(-e.r*.6,e.r);ctx.quadraticCurveTo(-e.r*1.35,-e.r*.2,0,-e.r)}
+  else if(e.kind==='brute'||e.boss){ctx.moveTo(-e.r*.95,-e.r*.4);ctx.lineTo(-e.r*.8,-e.r);ctx.lineTo(-e.r*.35,-e.r*.78);ctx.lineTo(0,-e.r*1.18);ctx.lineTo(e.r*.35,-e.r*.78);ctx.lineTo(e.r*.8,-e.r);ctx.lineTo(e.r*.95,-e.r*.4);ctx.lineTo(e.r*.8,e.r*.72);ctx.lineTo(0,e.r);ctx.lineTo(-e.r*.8,e.r*.72)}
+  else{ctx.moveTo(-e.r*.8,-e.r*.25);ctx.lineTo(-e.r*.6,-e.r*.9);ctx.lineTo(-e.r*.15,-e.r*.62);ctx.lineTo(e.r*.3,-e.r);ctx.lineTo(e.r*.55,-e.r*.45);ctx.lineTo(e.r*.95,-e.r*.2);ctx.lineTo(e.r*.75,e.r*.65);ctx.lineTo(0,e.r);ctx.lineTo(-e.r*.8,e.r*.55)}
+  ctx.closePath();ctx.fill();ctx.strokeStyle=e.boss?'#f05bff':e.kind==='wraith'?'#4de4ff':e.kind==='brute'?'#d53b64':'#a52a4a';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=e.kind==='wraith'?'#8df4ff':'#ff3157';ctx.shadowColor=e.kind==='wraith'?'#4de4ff':'#ff174d';ctx.shadowBlur=10;ctx.fillRect(-e.r*.5,-e.r*.18,e.r*.3,3);ctx.fillRect(e.r*.18,-e.r*.18,e.r*.3,3);ctx.shadowBlur=0;
+  if(e.boss){ctx.fillStyle='#19051d';ctx.fillRect(-45,-e.r-20,90,5);ctx.fillStyle='#ff4de8';ctx.fillRect(-45,-e.r-20,90*e.hp/e.maxHp,5)}
+  ctx.restore();
+ }
+ // damage numbers float away from hits
+ for(const f of floats){ctx.save();ctx.globalAlpha=clamp(f.life/f.max,0,1);ctx.font='bold '+f.size+'px Georgia';ctx.textAlign='center';ctx.fillStyle=f.color;ctx.shadowColor=f.color;ctx.shadowBlur=10;ctx.fillText(f.text,f.x,f.y);ctx.restore()}
+ // hostile broadcast bolts and collectible signal fragments
+ for(const b of projectiles){ctx.save();ctx.translate(b.x,b.y);ctx.shadowColor=b.color;ctx.shadowBlur=18;ctx.fillStyle=b.color;ctx.beginPath();ctx.arc(0,0,b.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ffe4ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,b.r+4,0,Math.PI*2);ctx.stroke();ctx.restore()}
+ for(const p of pickups){ctx.save();ctx.translate(p.x,p.y+Math.sin(p.phase)*4);ctx.rotate(p.phase*.3);ctx.shadowColor=p.type==='health'?'#ff7894':'#f7c9ff';ctx.shadowBlur=18;ctx.fillStyle=p.type==='health'?'#ff7894':'#e9aaff';ctx.beginPath();ctx.moveTo(0,-p.r);ctx.lineTo(p.r,0);ctx.lineTo(0,p.r);ctx.lineTo(-p.r,0);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff0f6';ctx.lineWidth=1;ctx.stroke();ctx.restore()}
+ // player shadow + body, animated coat
+ ctx.save();ctx.translate(player.x,player.y);let bob=Math.sin(elapsed*8)*2;ctx.translate(0,bob);
+ ctx.fillStyle='#030205';ctx.beginPath();ctx.ellipse(0,15,26,12,0,0,Math.PI*2);ctx.fill();
+ if(player.inv>0&&Math.floor(elapsed*24)%2===0)ctx.globalAlpha=.4;
+ // aura
+ ctx.shadowColor='#ff174d';ctx.shadowBlur=player.attack?28:12;ctx.strokeStyle='#e92d56';ctx.globalAlpha*=.5;ctx.beginPath();ctx.ellipse(0,0,28,34,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;ctx.shadowBlur=0;
+ // coat tail silhouette
+ pathPoly([[-11,-13],[-19,14],[-12,11],[-5,25],[0,10],[9,24],[15,7],[12,-13]],'#510d25','#ed3559',1.4);
+ // torso
+ pathPoly([[-12,-15],[0,-20],[12,-15],[10,7],[0,12],[-10,7]],'#9c1838','#ff6a80',1);
+ pathPoly([[-4,-16],[0,-3],[4,-16],[1,-17]],'#f7d6d7','#ff8fa1',.7);
+ // head
+ ctx.fillStyle='#e7b6aa';ctx.beginPath();ctx.ellipse(0,-24,10,12,0,0,Math.PI*2);ctx.fill();
+ // hair spikes
+ pathPoly([[-11,-23],[-17,-37],[-7,-32],[-5,-43],[2,-33],[12,-39],[10,-29],[15,-24],[7,-18],[-8,-18]],'#a71337','#ff4262',1);
+ // face grin
+ ctx.fillStyle='#25040d';ctx.beginPath();ctx.moveTo(-7,-23);ctx.lineTo(7,-23);ctx.lineTo(5,-18);ctx.lineTo(-5,-18);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#fff0f0';ctx.lineWidth=1;for(let i=-4;i<=4;i+=2){ctx.beginPath();ctx.moveTo(i,-23);ctx.lineTo(i,-20);ctx.stroke()}
+ // eyes
+ ctx.fillStyle='#ffe3b1';ctx.shadowColor='#ff244f';ctx.shadowBlur=8;ctx.beginPath();ctx.ellipse(-4,-27,2.1,1.5,-.2,0,Math.PI*2);ctx.ellipse(4,-27,2.1,1.5,.2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+ // bow tie + cane
+ pathPoly([[-5,-13],[0,-11],[-5,-8]],'#ed274f','#ff8598',.5);pathPoly([[0,-11],[5,-13],[5,-8]],'#ed274f','#ff8598',.5);
+ ctx.save();ctx.rotate(Math.atan2(player.faceY,player.faceX)*.45+.25);ctx.strokeStyle='#eec8a0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(14,-14);ctx.lineTo(19,20);ctx.stroke();ctx.strokeStyle='#ff4666';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(11,-18);ctx.quadraticCurveTo(9,-27,17,-26);ctx.stroke();ctx.fillStyle='#f9d5a0';ctx.beginPath();ctx.arc(15,-26,2,0,Math.PI*2);ctx.fill();ctx.restore();
+ // pulsing radio equalizer ring when charge is primed
+ if(player.charge>65){ctx.strokeStyle='#ff496a';ctx.globalAlpha=.22;ctx.lineWidth=1;for(let i=0;i<32;i++){let a=i*Math.PI*2/32,bar=5+Math.sin(elapsed*5+i*.7)*4+(player.charge-65)*.15;ctx.beginPath();ctx.moveTo(Math.cos(a)*31,Math.sin(a)*31);ctx.lineTo(Math.cos(a)*(31+bar),Math.sin(a)*(31+bar));ctx.stroke()}ctx.globalAlpha=1}
+ // attack crescent
+ if(player.attack>0){ctx.strokeStyle='#ff5c7b';ctx.lineWidth=5;ctx.globalAlpha=player.attack/.32;ctx.beginPath();ctx.arc(player.faceX*19,player.faceY*19,46,Math.atan2(player.faceY,player.faceX)-1.05,Math.atan2(player.faceY,player.faceX)+1.05);ctx.stroke();ctx.globalAlpha=1}
+ ctx.restore();
+ // particles
+ for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;ctx.shadowBlur=0;
+ ctx.restore();
+ // screen broadcast scanlines and edge red flash
+ ctx.fillStyle='#ff294d';ctx.globalAlpha=flash*.6;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;
+ ctx.fillStyle='rgba(255,100,130,.025)';for(let y=(elapsed*25)%4;y<H;y+=4)ctx.fillRect(0,y,W,1);
+ // corner broadcast labels
+ ctx.fillStyle='#f35a78';ctx.globalAlpha=.65;ctx.font='9px Arial';ctx.fillText('K-666 · LIVE TRANSMISSION',14,H-16);ctx.textAlign='right';ctx.fillText('SIGNAL '+Math.floor(90+Math.sin(elapsed*2)*8)+'%  ◉',W-14,H-16);ctx.textAlign='left';ctx.globalAlpha=1;
+}
+function loop(t){if(!last)last=t;let dt=Math.min((t-last)/1000,.035);last=t;update(dt);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+function chooseUpgrade(which){if(which==='armor'){player.maxHp=Math.min(160,player.maxHp+20);player.hp=clamp(player.hp+30,0,player.maxHp);upgrades.armor++}
+ if(which==='signal'){blastPower+=18;blastCost=Math.max(18,blastCost-4);upgrades.signal++}
+ if(which==='step'){moveSpeed+=22;upgrades.step++}
+ $('upgrade').classList.remove('show');paused=false;upgradedThisRun=false;intermissionAt=8;toast(({armor:'SOUL ARMOR INSTALLED',signal:'SIGNAL AMPLIFIED',step:'SHADOW STEP ENHANCED'})[which]);speak(({armor:'A little extra protection. How prudent.',signal:'Now that is a proper broadcast.',step:'Catch me if you can, darling.'})[which]);}
+document.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>chooseUpgrade(b.dataset.up)));
+$('skipUpgrade').addEventListener('click',()=>{$('upgrade').classList.remove('show');paused=false;upgradedThisRun=false;intermissionAt=8});
+function start(){audioInit();if(audio&&audio.state==='suspended')audio.resume();$('start').classList.add('hidden');$('pauseMenu').classList.add('hidden');$('upgrade').classList.remove('show');paused=false;running=true;gameOver=false;reset();if(musicStart)musicStart();speak('Well, well… looks like we have an audience. Do try to keep up.');banner('ON AIR','THE RADIO DEMON HAS ARRIVED')}
+function togglePause(){if(!running||gameOver||$('upgrade').classList.contains('show'))return;paused=!paused;$('pauseMenu').classList.toggle('hidden',!paused);if(paused&&'speechSynthesis'in window)speechSynthesis.cancel();if(!paused&&audio&&audio.state==='suspended')audio.resume();if(!paused&&musicStart)musicStart()}
+$('playBtn').addEventListener('click',start);$('pauseBtn').addEventListener('click',togglePause);$('resumeBtn').addEventListener('click',()=>{if(gameOver){start()}else if(!$('upgrade').classList.contains('show'))togglePause()});$('restartBtn').addEventListener('click',start);
+$('soundBtn').addEventListener('click',()=>{muted=!muted;$('soundBtn').textContent=muted?'♫ SOUND OFF':'♫ SOUND ON';if(master&&audio)master.gain.setTargetAtTime(muted?0:.5,audio.currentTime,.08);if(muted&&'speechSynthesis'in window)speechSynthesis.cancel();else if(!muted&&audio){audio.resume();if(musicStart)musicStart()}});
+document.querySelectorAll('[data-act]').forEach(b=>{
+ const fn={attack,blast,dash,special}[b.dataset.act];
+ b.addEventListener('pointerdown',()=>b.classList.add('pressed'),{passive:true});
+ ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>b.classList.remove('pressed'),{passive:true}));
+ b.addEventListener('click',e=>{e.preventDefault();if(!fn){toast('THIS ACTION IS NOT AVAILABLE');return;}if(audio&&audio.state==='suspended')audio.resume();try{fn()}catch(err){console.error(err);toast('ACTION ERROR · RELOAD THE GAME')}});
+});
+const stick=$('stick'),nub=$('nub');function stickMove(e){const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.34,m=Math.hypot(dx,dy),k=Math.min(1,max/(m||1));joy.x=dx*k/max;joy.y=dy*k/max;nub.style.left=(31+joy.x*30)+'%';nub.style.top=(31+joy.y*30)+'%'}
+stick.addEventListener('pointerdown',e=>{e.preventDefault();joy.on=true;stick.setPointerCapture(e.pointerId);stickMove(e)});stick.addEventListener('pointermove',e=>{if(joy.on)stickMove(e)});function stickEnd(){joy.on=false;joy.x=joy.y=0;nub.style.left='31%';nub.style.top='31%'}stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
+addEventListener('keydown',e=>{keys[e.key]=true;if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();if(e.repeat)return;if(e.key.toLowerCase()==='j'||e.key===' ')attack();if(e.key.toLowerCase()==='k')dash();if(e.key.toLowerCase()==='l')blast();if(e.key.toLowerCase()==='i')special();if(e.key==='Escape')togglePause();if(e.key==='1')attack();if(e.key==='2')dash();if(e.key==='3')blast();if(e.key==='4')special()});
+addEventListener('keyup',e=>keys[e.key]=false);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&running&&!paused&&audio&&audio.state==='suspended'){audio.resume();if(musicStart)musicStart()}});
+})();
+</script>
+</body>
+</html>
